@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutabaah Shaumiyah Ramadhan 1447H</title>
+    <link rel="icon" href="logosmpit.png" type="image/png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Input Styling */
+        .input-future {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .input-future:focus {
+            border-color: #2dd4bf; /* Teal-400 */
+            box-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
+            outline: none;
+        }
+
+        /* Checkbox Custom */
+        .checkbox-wrapper input:checked + div {
+            background-color: #2dd4bf;
+            border-color: #2dd4bf;
+        }
+        
+        /* Loading Animation */
+        .loader {
+            border-top-color: #2dd4bf;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="py-8 px-4 flex justify-center items-center">
+
+    <div class="glass-card w-full max-w-2xl rounded-2xl p-6 md:p-10 relative overflow-hidden">
+        
+        <div class="absolute -top-20 -right-20 w-64 h-64 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+
+        <div class="text-center mb-8 relative z-10">
+            <img src="logosmpit.png" alt="Logo SMPIT" class="h-20 mx-auto mb-4 drop-shadow-lg">
+            <h2 class="text-teal-300 text-lg font-semibold tracking-widest uppercase mb-1">Marhaban Ya Ramadhan 1447 Hijriyah</h2>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-teal-200 to-white">
+                Mutabaah Shaumiyah
+            </h1>
+            
+            <div class="mt-4 p-3 bg-white/10 rounded-lg inline-block border border-white/10">
+                <p id="date-masehi" class="text-sm font-medium text-gray-300"></p>
+                <p id="date-hijri" class="text-teal-400 font-bold text-lg"></p>
+                <p id="ramadhan-day" class="text-yellow-400 text-sm font-bold mt-1"></p>
+            </div>
+        </div>
+
+        <form id="mutabaahForm" class="space-y-6 relative z-10">
+            
+            <div>
+                <label class="block text-sm font-medium text-teal-200 mb-1">Email Orang Tua</label>
+                <input type="email" id="email" required placeholder="email@contoh.com" 
+                       class="input-future w-full rounded-lg px-4 py-3">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-teal-200 mb-1">Pilih Kelas</label>
+                    <select id="kelas" class="input-future w-full rounded-lg px-4 py-3 cursor-pointer">
+                        <option value="">Loading Data...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-teal-200 mb-1">Nama Siswa</label>
+                    <select id="nama" class="input-future w-full rounded-lg px-4 py-3 cursor-pointer" disabled>
+                        <option value="">Pilih Kelas Terlebih Dahulu</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="h-px bg-gradient-to-r from-transparent via-teal-500/50 to-transparent my-6"></div>
+
+            <div>
+                <label class="block text-lg font-semibold text-white mb-3">Status Puasa Hari Ini</label>
+                <div class="flex gap-6">
+                    <label class="flex items-center cursor-pointer checkbox-wrapper">
+                        <input type="radio" name="puasa" value="Puasa" class="hidden peer" checked onchange="toggleAlasan(false)">
+                        <div class="w-6 h-6 border-2 border-gray-500 rounded-full flex items-center justify-center peer-checked:bg-teal-500 peer-checked:border-teal-500 transition-all">
+                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <span class="ml-3 text-gray-200">Berpuasa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer checkbox-wrapper">
+                        <input type="radio" name="puasa" value="Tidak Puasa" class="hidden peer" onchange="toggleAlasan(true)">
+                        <div class="w-6 h-6 border-2 border-gray-500 rounded-full flex items-center justify-center peer-checked:bg-red-500 peer-checked:border-red-500 transition-all">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                        <span class="ml-3 text-gray-200">Tidak Berpuasa</span>
+                    </label>
+                </div>
+                <div id="alasan-container" class="mt-3 hidden">
+                    <input type="text" id="alasan" placeholder="Alasan tidak berpuasa (Sakit/Haid/Musafir)" 
+                           class="input-future w-full rounded-lg px-4 py-3 text-sm text-yellow-300 border-yellow-500/50">
+                </div>
+            </div>
+
+            
+            <div>
+    <label class="block text-lg font-semibold text-white mb-3">Pelaksanaan Sholat</label>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <script>
+            const sholats = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya', 'Dhuha', 'Tarawih', 'Tahajud'];
+            const sholatWajib = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'];
+
+            sholats.forEach(s => {
+                // Cek apakah sholat wajib
+                const isWajib = sholatWajib.includes(s);
+                
+                // Jika Wajib: Kuning (text-yellow-400) dan Tebal (font-bold)
+                // Jika Sunnah: Abu-abu (text-gray-300) dan Biasa
+                const textClass = isWajib ? 'font-bold text-yellow-400' : 'text-gray-300';
+
+                document.write(`
+                    <label class="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-800/50 cursor-pointer hover:bg-gray-700/50 transition-all">
+                        <input type="checkbox" name="sholat" value="${s}" class="w-4 h-4 text-teal-500 bg-transparent border-gray-500 rounded focus:ring-teal-500 focus:ring-2">
+                        <span class="ml-2 text-sm ${textClass}">${s}</span>
+                    </label>
+                `);
+            });
+        </script>
+    </div>
+</div>
+
+            <div>
+                <label class="block text-sm font-medium text-teal-200 mb-2">Dominan Sholat Wajib Dilakukan Di:</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="lokasi" value="Masjid" class="hidden peer">
+                        <span class="px-4 py-2 rounded-full border border-gray-600 bg-transparent text-gray-400 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-500 transition-all">🕌 Masjid</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="lokasi" value="Rumah" class="hidden peer">
+                        <span class="px-4 py-2 rounded-full border border-gray-600 bg-transparent text-gray-400 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-500 transition-all">🏠 Rumah</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                <label class="block text-lg font-semibold text-white mb-3">Capaian Tilawah</label>
+                <div class="flex items-center gap-2">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-400">Dari Halaman</label>
+                        <input type="number" id="tilawahStart" min="0" class="input-future w-full rounded-lg px-3 py-2 mt-1">
+                    </div>
+                    <span class="text-teal-400 font-bold mt-4">➜</span>
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-400">Sampai Halaman</label>
+                        <input type="number" id="tilawahEnd" min="0" class="input-future w-full rounded-lg px-3 py-2 mt-1">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-teal-200 mb-2">Melakukan Murojaah Hafalan?</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="murojaah" value="Ya" class="hidden peer">
+                        <span class="px-4 py-2 rounded-lg border border-gray-600 peer-checked:bg-green-600 peer-checked:text-white transition-all w-full text-center">Ya, Murojaah</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="murojaah" value="Tidak" class="hidden peer">
+                        <span class="px-4 py-2 rounded-lg border border-gray-600 peer-checked:bg-gray-600 peer-checked:text-white transition-all w-full text-center">Belum</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3 mt-6 p-4 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
+                <input type="checkbox" id="validasi" required class="mt-1 w-5 h-5 text-yellow-500 bg-gray-800 border-gray-600 rounded focus:ring-yellow-500">
+                <label for="validasi" class="text-sm text-gray-300">
+                    Bismillah, saya bersaksi bahwa data yang saya isikan adalah benar dan sesuai dengan kondisi ananda hari ini.
+                </label>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="w-full mt-6 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(20,184,166,0.5)] transform hover:scale-[1.02] transition-all flex justify-center items-center gap-2">
+                <span>Kirim Laporan</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+
+        </form>
+
+        <div class="text-center mt-6 text-xs text-gray-500">
+            &copy; 2026 <span>aktechmaster</span> <br> Designed & Developed by aktechmaster
+        </div>
+    </div>
+
+    <script>
+        // --- KONFIGURASI URL SCRIPT ANDA ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU7qDBBkOxZF5WV2E2YFgigRsnLuMWhdiW6yjac7Hte8L-Zb8riKbhkgVV5EX_eH7I/exec'; 
+
+        // 1. Initial Setup (Date & Email)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set Tanggal Masehi
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-masehi').innerText = today.toLocaleDateString('id-ID', options);
+
+            // Simulasi Tanggal Hijriah (Perkiraan Ramadhan 1447H sekitar 18 Feb 2026)
+            // Note: Untuk akurasi tinggi perlu library external/API, ini pendekatan matematis sederhana
+            // Kita asumsikan 1 Ramadhan 1447 = 18 Feb 2026
+            const startRamadhan = new Date('2026-02-18'); 
+            const diffTime = Math.ceil((today - startRamadhan) / (1000 * 60 * 60 * 24)) + 1;
+            
+            let hijriText = "";
+            let ramadhanDayText = "";
+
+            if (diffTime > 0 && diffTime <= 30) {
+                hijriText = `${diffTime} Ramadhan 1447 H`;
+                ramadhanDayText = `Puasa Hari Ke-${diffTime}`;
+            } else if (diffTime < 1) {
+                hijriText = "Sya'ban 1447 H";
+                ramadhanDayText = "Menunggu Ramadhan";
+            } else {
+                hijriText = "Syawal 1447 H";
+                ramadhanDayText = "Ramadhan Telah Usai";
+            }
+
+            document.getElementById('date-hijri').innerText = hijriText;
+            document.getElementById('ramadhan-day').innerText = ramadhanDayText;
+
+            // Load Email
+            const savedEmail = localStorage.getItem('parentEmail');
+            if(savedEmail) document.getElementById('email').value = savedEmail;
+
+            // Load Data Siswa dari GAS
+            fetchDataSiswa();
+        });
+
+        // 2. Load Data Siswa
+        let studentData = {};
+        
+        async function fetchDataSiswa() {
+            const kelasSelect = document.getElementById('kelas');
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    studentData = result.data;
+                    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+                    Object.keys(studentData).forEach(cls => {
+                        kelasSelect.innerHTML += `<option value="${cls}">${cls}</option>`;
+                    });
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Gagal memuat data siswa. Periksa koneksi internet.', 'error');
+            }
+        }
+
+        // 3. Dependent Dropdown
+        document.getElementById('kelas').addEventListener('change', function() {
+            const namaSelect = document.getElementById('nama');
+            const selectedClass = this.value;
+            
+            namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
+            
+            if (selectedClass && studentData[selectedClass]) {
+                namaSelect.disabled = false;
+                studentData[selectedClass].forEach(name => {
+                    namaSelect.innerHTML += `<option value="${name}">${name}</option>`;
+                });
+            } else {
+                namaSelect.disabled = true;
+            }
+        });
+
+        // 4. Toggle Alasan Puasa
+        function toggleAlasan(isNotFasting) {
+            const container = document.getElementById('alasan-container');
+            if (isNotFasting) {
+                container.classList.remove('hidden');
+                document.getElementById('alasan').setAttribute('required', 'true');
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('alasan').removeAttribute('required');
+                document.getElementById('alasan').value = '';
+            }
+        }
+
+        // 5. Handle Submit
+        document.getElementById('mutabaahForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Simpan Email
+            localStorage.setItem('parentEmail', document.getElementById('email').value);
+
+            // Validasi Sholat (Minimal pilih jika dilakukan, atau opsional tergantung kebijakan)
+            // Di sini kita biarkan kosong jika tidak sholat, tapi tombol submit akan memprosesnya.
+
+            // Tampilkan Loading Custom
+            const btn = document.getElementById('btnSubmit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 mr-2"></div> Mengirim...`;
+            btn.disabled = true;
+
+            // Kumpulkan Data
+            const sholatChecked = Array.from(document.querySelectorAll('input[name="sholat"]:checked')).map(cb => cb.value).join(", ");
+            const puasaStatus = document.querySelector('input[name="puasa"]:checked').value;
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                kelas: document.getElementById('kelas').value,
+                nama: document.getElementById('nama').value,
+                statusPuasa: puasaStatus,
+                alasanPuasa: puasaStatus === 'Tidak Puasa' ? document.getElementById('alasan').value : '-',
+                listSholat: sholatChecked || '-',
+                lokasiSholat: document.querySelector('input[name="lokasi"]:checked')?.value || '-',
+                tilawahStart: document.getElementById('tilawahStart').value || '0',
+                tilawahEnd: document.getElementById('tilawahEnd').value || '0',
+                murojaah: document.querySelector('input[name="murojaah"]:checked')?.value || '-',
+                validasi: "Valid",
+                tanggal: new Date().toLocaleDateString('id-ID') // Untuk pengecekan backend
+            };
+
+            try {
+                // Kirim ke GAS dengan mode no-cors (CORS handling) atau standard text/plain
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    Swal.fire({
+                        title: 'Jazakumullah Khairan!',
+                        text: result.message,
+                        icon: 'success',
+                        background: '#0f172a',
+                        color: '#fff',
+                        confirmButtonColor: '#0f766e'
+                    }).then(() => {
+                        // Reset Form tapi simpan email
+                        window.location.reload(); 
+                    });
+                } else {
+                     Swal.fire({
+                        title: 'Mohon Maaf',
+                        text: result.message,
+                        icon: 'warning',
+                        background: '#0f172a',
+                        color: '#fff',
+                        confirmButtonColor: '#d97706'
+                    });
+                }
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Terjadi kesalahan sistem.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
