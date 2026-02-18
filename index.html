@@ -221,43 +221,60 @@
         // --- KONFIGURASI URL SCRIPT ANDA ---
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU7qDBBkOxZF5WV2E2YFgigRsnLuMWhdiW6yjac7Hte8L-Zb8riKbhkgVV5EX_eH7I/exec'; 
 
-        // 1. Initial Setup (Date & Email)
         document.addEventListener('DOMContentLoaded', () => {
-            // Set Tanggal Masehi
-            const today = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('date-masehi').innerText = today.toLocaleDateString('id-ID', options);
+    // 1. Set Tanggal Masehi
+    const today = new Date();
+    // PENTING: Reset jam ke 00:00:00 agar perhitungan murni berdasarkan tanggal kalender
+    today.setHours(0, 0, 0, 0);
 
-            // Simulasi Tanggal Hijriah (Perkiraan Ramadhan 1447H sekitar 18 Feb 2026)
-            // Note: Untuk akurasi tinggi perlu library external/API, ini pendekatan matematis sederhana
-            // Kita asumsikan 1 Ramadhan 1447 = 18 Feb 2026
-            const startRamadhan = new Date('2026-02-18'); 
-            const diffTime = Math.ceil((today - startRamadhan) / (1000 * 60 * 60 * 24)) + 1;
-            
-            let hijriText = "";
-            let ramadhanDayText = "";
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('date-masehi').innerText = today.toLocaleDateString('id-ID', options);
 
-            if (diffTime > 0 && diffTime <= 30) {
-                hijriText = `${diffTime} Ramadhan 1447 H`;
-                ramadhanDayText = `Puasa Hari Ke-${diffTime}`;
-            } else if (diffTime < 1) {
-                hijriText = "Sya'ban 1447 H";
-                ramadhanDayText = "Menunggu Ramadhan";
-            } else {
-                hijriText = "Syawal 1447 H";
-                ramadhanDayText = "Ramadhan Telah Usai";
-            }
+    // 2. Simulasi Tanggal Hijriah
+    // Target: 1 Ramadhan 1447 = 19 Feb 2026
+    const startRamadhan = new Date('2026-02-19'); 
+    // Reset juga jam target ke 00:00:00
+    startRamadhan.setHours(0, 0, 0, 0);
 
-            document.getElementById('date-hijri').innerText = hijriText;
-            document.getElementById('ramadhan-day').innerText = ramadhanDayText;
+    // Rumus menghitung selisih hari (1 hari = 1000ms * 60detik * 60menit * 24jam)
+    const oneDay = 1000 * 60 * 60 * 24;
+    
+    // Hitung selisih waktu, dibagi satu hari, lalu dibulatkan (round)
+    // Ditambah 1 karena jika selisih 0 (hari H), itu dianggap hari ke-1
+    const diffTime = Math.round((today - startRamadhan) / oneDay) + 1;
+    
+    let hijriText = "";
+    let ramadhanDayText = "";
 
-            // Load Email
-            const savedEmail = localStorage.getItem('parentEmail');
-            if(savedEmail) document.getElementById('email').value = savedEmail;
+    // Logika Penentuan Teks
+    if (diffTime > 0 && diffTime <= 30) {
+        // Jika hasil 1 s/d 30, berarti sedang puasa
+        hijriText = `${diffTime} Ramadhan 1447 H`;
+        ramadhanDayText = `Puasa Hari Ke-${diffTime}`;
+    } else if (diffTime < 1) {
+        // Jika hasil 0 atau minus, berarti belum puasa (Sya'ban)
+        hijriText = "Sya'ban 1447 H";
+        ramadhanDayText = "Menunggu Ramadhan";
+    } else {
+        // Jika hasil di atas 30, berarti lebaran (Syawal)
+        hijriText = "Syawal 1447 H";
+        ramadhanDayText = "Ramadhan Telah Usai";
+    }
 
-            // Load Data Siswa dari GAS
-            fetchDataSiswa();
-        });
+    // Tampilkan ke layar
+    document.getElementById('date-hijri').innerText = hijriText;
+    document.getElementById('ramadhan-day').innerText = ramadhanDayText;
+
+    // 3. Load Email (Fitur tambahan)
+    const savedEmail = localStorage.getItem('parentEmail');
+    if(savedEmail) document.getElementById('email').value = savedEmail;
+
+    // 4. Load Data Siswa (Fitur tambahan)
+    // Pastikan fungsi fetchDataSiswa() sudah ada di bagian lain kode Anda
+    if (typeof fetchDataSiswa === "function") { 
+        fetchDataSiswa(); 
+    }
+});
 
         // 2. Load Data Siswa
         let studentData = {};
